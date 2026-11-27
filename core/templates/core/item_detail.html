@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ item.name }} - Detail Barang</title>
+</head>
+<body>
+    <p><a href="{% url 'item_list' %}">&larr; Kembali ke Daftar Barang</a></p>
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h1>{{ item.name }}</h1>
+    <p><strong>Tipe Laporan:</strong> {{ item.get_report_type_display }}</p>
+    <p><strong>Kategori:</strong> {{ item.get_category_display }}</p>
+    <p><strong>Lokasi:</strong> {{ item.get_location_display }} — {{ item.location_detail }}</p>
+    <p><strong>Tanggal Kejadian:</strong> {{ item.incident_date }}</p>
+    <p><strong>Status:</strong> {{ item.get_status_display }}</p>
+    <p><strong>Pelapor:</strong> {{ item.reporter.username }}</p>
+    <p><strong>Deskripsi:</strong> {{ item.description|default:"-" }}</p>
+
+    {% if item.image %}
+        <p><img src="{{ item.image.url }}" alt="{{ item.name }}" width="300"></p>
+    {% endif %}
+
+    {% if can_manage %}
+        <hr>
+        <form method="post" action="{% url 'item_toggle_status' item.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">
+                {% if item.status == 'ACTIVE' %}Tandai Sudah Dikembalikan (Returned){% else %}Aktifkan Kembali (Active){% endif %}
+            </button>
+        </form>
+        | <a href="{% url 'item_update' item.pk %}">Edit Laporan</a>
+        | <a href="{% url 'item_delete' item.pk %}">Hapus Laporan</a>
+    {% endif %}
+</body>
+</html>

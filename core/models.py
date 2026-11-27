@@ -59,7 +59,12 @@ class Item(models.Model):
     )
 
     # Input manual waktu oleh user, terlepas dari date yang di bawah
-    incident_date = models.DateField()
+    incident_date = models.DateField(verbose_name="Tanggal Kejadian")
+    incident_time = models.TimeField(
+        blank=True,
+        null=True,
+        verbose_name="Waktu Kejadian (Opsional)",
+    )
 
     image = models.ImageField(
         upload_to="items/",

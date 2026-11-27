@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daftar Barang - Lost & Found Fasilkom</title>
+</head>
+<body>
+    <h1>Daftar Barang Hilang & Ditemukan</h1>
+    <p>
+        <a href="{% url 'item_create_lost' %}">+ Lapor Barang Saya yang Hilang</a> |
+        <a href="{% url 'item_create_found' %}">+ Lapor Barang yang Ditemukan</a>
+    </p>
+
+    <form method="get">
+        <input type="text" name="q" placeholder="Cari nama barang / ruangan..." value="{{ selected_q }}">
+        <select name="report_type">
+            <option value="">Semua Tipe</option>
+            {% for val, label in report_types %}
+                <option value="{{ val }}" {% if selected_report_type == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="category">
+            <option value="">Semua Kategori</option>
+            {% for val, label in categories %}
+                <option value="{{ val }}" {% if selected_category == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="location">
+            <option value="">Semua Lokasi</option>
+            {% for val, label in locations %}
+                <option value="{{ val }}" {% if selected_location == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="status">
+            <option value="">Semua Status</option>
+            {% for val, label in statuses %}
+                <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+        <a href="{% url 'item_list' %}">Reset</a>
+    </form>
+
+    <hr>
+
+    <ul>
+        {% for item in items %}
+            <li>
+                <strong>[{{ item.get_report_type_display }}]</strong>
+                <a href="{% url 'item_detail' item.pk %}">{{ item.name }}</a>
+                — {{ item.get_category_display }} | {{ item.get_location_display }} ({{ item.location_detail }})
+                | Status: <strong>{{ item.get_status_display }}</strong>
+            </li>
+        {% empty %}
+            <li>Belum ada laporan barang.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ form_title }}</title>
+</head>
+<body>
+    <p><a href="{% url 'item_list' %}">&larr; Batal</a></p>
+    <h1>{{ form_title }}</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Simpan Laporan</button>
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 1. Tombol isi tanggal/waktu sekarang pada incident_date
+            const dateInput = document.getElementById("id_incident_date");
+            if (dateInput && dateInput.parentNode) {
+                const nowBtn = document.createElement("button");
+                nowBtn.type = "button";
+                nowBtn.textContent = "Gunakan Tanggal Hari Ini";
+                nowBtn.style.marginLeft = "8px";
+
+                nowBtn.addEventListener("click", function () {
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, "0");
+                    const day = String(now.getDate()).padStart(2, "0");
+                    dateInput.value = `${year}-${month}-${day}`;
+                });
+
+                dateInput.parentNode.insertBefore(nowBtn, dateInput.nextSibling);
+            }
+
+            // 2. Sembunyikan input foto & tampilkan keterangan privasi untuk kategori DOKUMEN
+            const categorySelect = document.getElementById("id_category");
+            const imageInput = document.getElementById("id_image");
+            const imageWrapper = imageInput ? imageInput.closest("p") : null;
+
+            const privacyNotice = document.createElement("p");
+            privacyNotice.id = "dokumen-privacy-notice";
+            privacyNotice.innerHTML =
+                "<strong>Image:</strong> <em>Kategori Dokumen / Identitas tidak mengunggah foto demi menjaga privasi dan keamanan data pribadi (seperti KTP, KTM, atau SIM).</em>";
+            privacyNotice.style.display = "none";
+
+            if (imageWrapper && imageWrapper.parentNode) {
+                imageWrapper.parentNode.insertBefore(privacyNotice, imageWrapper.nextSibling);
+            }
+
+            function toggleImageField() {
+                if (!categorySelect || !imageWrapper) return;
+
+                if (categorySelect.value === "DOKUMEN") {
+                    imageWrapper.style.display = "none";
+                    imageInput.value = "";
+                    privacyNotice.style.display = "";
+                } else {
+                    imageWrapper.style.display = "";
+                    privacyNotice.style.display = "none";
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
