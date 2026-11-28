@@ -1,16 +1,37 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Hapus Laporan</title>
-</head>
-<body>
-    <h1>Konfirmasi Hapus</h1>
-    <p>Yakin ingin menghapus laporan <strong>{{ item.name }}</strong>?</p>
+{% extends "core/base.html" %}
 
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Ya, Hapus</button>
-        <a href="{% url 'item_detail' item.pk %}">Batal</a>
-    </form>
-</body>
-</html>
+{% block title %}Hapus Laporan - Lost & Found Fasilkom UI{% endblock %}
+
+{% block content %}
+<section class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-14">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+        </div>
+
+        <h1 class="text-xl font-extrabold text-slate-900">Hapus Laporan Barang?</h1>
+        <p class="text-sm text-slate-600 mt-2">
+            Laporan berikut akan dihapus secara permanen dan tidak dapat dikembalikan:
+        </p>
+
+        <div class="my-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left">
+            <p class="text-sm font-bold text-slate-900">{{ item.name }}</p>
+            <p class="text-xs text-slate-500 mt-1">
+                {{ item.get_report_type_display }} &middot; {{ item.get_location_display }} ({{ item.location_detail }})
+            </p>
+        </div>
+
+        <form method="post" class="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
+            {% csrf_token %}
+            <a href="{% url 'item_detail' item.pk %}" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition">
+                Batal
+            </a>
+            <button type="submit" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold shadow-sm transition">
+                Ya, Hapus Permanen
+            </button>
+        </form>
+    </div>
+</section>
+{% endblock %}

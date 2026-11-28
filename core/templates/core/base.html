@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Lost & Found Fasilkom UI{% endblock %}</title>
+
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        fasilkom: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e3a8a',
+                            900: '#172554',
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <!-- Navbar -->
+    <header class="bg-white/95 backdrop-blur border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Brand -->
+                <a href="{% url 'home' %}" class="flex items-center gap-2.5 group">
+                    <div class="w-9 h-9 rounded-xl bg-fasilkom-800 text-amber-400 flex items-center justify-center font-extrabold text-sm shadow-sm group-hover:bg-fasilkom-700 transition">
+                        LF
+                    </div>
+                    <div class="leading-tight">
+                        <span class="block text-base font-bold text-slate-900">Lost & Found</span>
+                        <span class="block text-[11px] font-semibold tracking-wide text-fasilkom-600 uppercase">Fasilkom UI</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="{% url 'home' %}" class="px-3.5 py-2 rounded-lg text-sm font-medium {% if request.resolver_match.url_name == 'home' %}bg-fasilkom-50 text-fasilkom-700{% else %}text-slate-600 hover:text-slate-900 hover:bg-slate-100{% endif %} transition">
+                        Beranda
+                    </a>
+                    <a href="{% url 'item_list' %}" class="px-3.5 py-2 rounded-lg text-sm font-medium {% if request.resolver_match.url_name == 'item_list' %}bg-fasilkom-50 text-fasilkom-700{% else %}text-slate-600 hover:text-slate-900 hover:bg-slate-100{% endif %} transition">
+                        Daftar Barang
+                    </a>
+                </nav>
+
+                <!-- Desktop Actions -->
+                <div class="hidden md:flex items-center gap-2.5">
+                    <a href="{% url 'item_create_lost' %}" class="px-3.5 py-2 rounded-lg text-sm font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 transition">
+                        + Lapor Hilang
+                    </a>
+                    <a href="{% url 'item_create_found' %}" class="px-3.5 py-2 rounded-lg text-sm font-semibold bg-fasilkom-800 text-white hover:bg-fasilkom-700 shadow-sm transition">
+                        + Lapor Ditemukan
+                    </a>
+
+                    <div class="h-6 w-px bg-slate-200 mx-1"></div>
+
+                    {% if user.is_authenticated %}
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                {{ user.full_name|default:user.username }}
+                            </span>
+                            {% if user.is_staff %}
+                                <a href="/admin/" class="text-xs font-semibold text-fasilkom-700 hover:underline">Admin</a>
+                            {% endif %}
+                            
+                            <form method="post" action="/admin/logout/" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition">
+                                    Keluar
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        
+                        <a href="/admin/login/?next={{ request.path }}" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">
+                            Masuk
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile Hamburger Button -->
+                <button id="mobile-menu-btn" type="button" aria-label="Buka menu navigasi" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-4 space-y-2">
+            <a href="{% url 'home' %}" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">Beranda</a>
+            <a href="{% url 'item_list' %}" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">Daftar Barang</a>
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <a href="{% url 'item_create_lost' %}" class="text-center px-3 py-2 rounded-lg text-sm font-semibold bg-rose-50 text-rose-700 border border-rose-200">+ Lapor Hilang</a>
+                <a href="{% url 'item_create_found' %}" class="text-center px-3 py-2 rounded-lg text-sm font-semibold bg-fasilkom-800 text-white">+ Lapor Ditemukan</a>
+            </div>
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                {% if user.is_authenticated %}
+                    <span class="text-xs font-semibold text-slate-600">Masuk sebagai {{ user.full_name|default:user.username }}</span>
+                    <form method="post" action="/admin/logout/">
+                        {% csrf_token %}
+                        <button type="submit" class="text-xs font-semibold text-rose-600">Keluar</button>
+                    </form>
+                {% else %}
+                    <a href="/admin/login/?next={{ request.path }}" class="w-full text-center px-3 py-2 rounded-lg text-sm font-semibold bg-slate-100 text-slate-800">Masuk</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Django Messages -->
+    {% if messages %}
+        <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mt-4 space-y-2">
+            {% for message in messages %}
+                <div class="alert-banner flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-medium border shadow-sm
+                    {% if 'error' in message.tags %}bg-rose-50 text-rose-800 border-rose-200
+                    {% elif 'warning' in message.tags %}bg-amber-50 text-amber-800 border-amber-200
+                    {% else %}bg-emerald-50 text-emerald-800 border-emerald-200{% endif %}">
+                    <span>{{ message }}</span>
+                    <button type="button" class="alert-close text-current opacity-60 hover:opacity-100 font-bold px-1">×</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-800">Lost & Found Fasilkom UI</span>
+                <span>·</span>
+                <span>Layanan Pelaporan Barang Hilang & Ditemukan</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="{% url 'home' %}" class="hover:text-fasilkom-700 transition">Beranda</a>
+                <a href="{% url 'item_list' %}" class="hover:text-fasilkom-700 transition">Daftar Barang</a>
+                <a href="{% url 'item_create_lost' %}" class="hover:text-fasilkom-700 transition">Lapor Barang</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="{% static 'core/js/script.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
