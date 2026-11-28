@@ -1,18 +1,206 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ item.name }} - Detail Barang</title>
-</head>
-<body>
-    <p><a href="{% url 'item_list' %}">&larr; Kembali ke Daftar Barang</a></p>
+{% extends "core/base.html" %}
 
-    {% if messages %}
-        <ul>
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+{% block title %}{{ item.name }} - Lost & Found Fasilkom UI{% endblock %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-sm text-slate-500 mb-6">
+        <a href="{% url 'home' %}" class="hover:text-fasilkom-700 transition">Beranda</a>
+        <span>/</span>
+        <a href="{% url 'item_list' %}" class="hover:text-fasilkom-700 transition">Daftar Barang</a>
+        <span>/</span>
+        <span class="text-slate-800 font-medium truncate">{{ item.name }}</span>
+    </nav>
+
+    <!-- Main Detail Card -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-12">
+            <!-- Kolom Visual -->
+            <div class="lg:col-span-5 bg-slate-100 flex items-center justify-center min-h-[280px] lg:min-h-[420px] p-4">
+                {% if item.category == 'DOKUMEN' %}
+                    <div class="text-center max-w-xs px-4 py-8">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mb-4 shadow-sm">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-base font-bold text-slate-800">Foto Disembunyikan Demi Privasi</h2>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            Kategori Dokumen / Identitas (seperti KTP, KTM, atau SIM) tidak menampilkan foto publik untuk melindungi data pribadi pemilik.
+                        </p>
+                    </div>
+                {% elif item.image %}
+                    <img src="{{ item.image.url }}" alt="{{ item.name }}" class="w-full h-full max-h-[460px] object-contain rounded-2xl bg-white">
+                {% else %}
+                    <div class="text-center text-slate-400 py-10">
+                        <svg class="w-14 h-14 mx-auto mb-2 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <p class="text-sm font-medium">Tidak ada foto dilampirkan</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Kolom Informasi -->
+            <div class="lg:col-span-7 p-6 sm:p-8 flex flex-col">
+                <!-- Badges -->
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+                    {% if item.report_type == 'LOST' %}
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200">
+                            {{ item.get_report_type_display }}
+                        </span>
+                    {% else %}
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                            {{ item.get_report_type_display }}
+                        </span>
+                    {% endif %}
+
+                    {% if item.status == 'ACTIVE' %}
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-fasilkom-50 text-fasilkom-700 border border-fasilkom-100">
+                            Status: Active
+                        </span>
+                    {% else %}
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700">
+                            Status: Returned
+                        </span>
+                    {% endif %}
+                </div>
+
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">{{ item.name }}</h1>
+
+                <!-- Metadata Grid -->
+                <dl class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                        <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Kategori</dt>
+                        <dd class="mt-1 font-semibold text-slate-800">{{ item.get_category_display }}</dd>
+                    </div>
+                    <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                        <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Tanggal Kejadian</dt>
+                        <dd class="mt-1 font-semibold text-slate-800">
+                            {{ item.incident_date|date:"d F Y" }}
+                            {% if item.incident_time %}&middot; {{ item.incident_time|time:"H:i" }} WIB{% endif %}
+                        </dd>
+                    </div>
+                    <div class="sm:col-span-2 p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                        <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Lokasi Kejadian</dt>
+                        <dd class="mt-1 font-semibold text-slate-800">{{ item.get_location_display }} &mdash; {{ item.location_detail }}</dd>
+                    </div>
+                </dl>
+
+                <!-- Deskripsi -->
+                <div class="mt-6">
+                    <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Deskripsi Tambahan</h2>
+                    <p class="text-sm text-slate-700 leading-relaxed bg-slate-50/70 rounded-2xl p-4 border border-slate-100">
+                        {% if item.description %}
+                            {{ item.description|linebreaksbr }}
+                        {% else %}
+                            <span class="text-slate-400 italic">Pelapor tidak menambahkan deskripsi khusus.</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Kartu Pelapor & Tombol Contact Reporter -->
+                <div class="mt-6 pt-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-fasilkom-100 text-fasilkom-800 font-bold flex items-center justify-center text-sm uppercase">
+                            {{ item.reporter.username|slice:":2" }}
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-900">{{ item.reporter.full_name|default:item.reporter.username }}</p>
+                            <p class="text-xs text-slate-500">Dilaporkan {{ item.created_at|date:"d M Y, H:i" }} WIB</p>
+                        </div>
+                    </div>
+
+                    <button id="open-contact-modal" type="button" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-fasilkom-800 hover:bg-fasilkom-700 text-white text-sm font-bold shadow-sm transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                        Contact Reporter
+                    </button>
+                </div>
+
+                <!-- Panel Kelola Laporan (Hanya Pelapor / Admin) -->
+                {% if can_manage %}
+                    <div class="mt-6 pt-5 border-t border-dashed border-slate-200">
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Kelola Laporan Ini</p>
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <form method="post" action="{% url 'item_toggle_status' item.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold transition
+                                    {% if item.status == 'ACTIVE' %}bg-emerald-600 hover:bg-emerald-700 text-white{% else %}bg-amber-100 hover:bg-amber-200 text-amber-900{% endif %}">
+                                    {% if item.status == 'ACTIVE' %}Tandai Sudah Dikembalikan (Returned){% else %}Aktifkan Kembali (Active){% endif %}
+                                </button>
+                            </form>
+                            <a href="{% url 'item_update' item.pk %}" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                                Edit Laporan
+                            </a>
+                            <a href="{% url 'item_delete' item.pk %}" class="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition">
+                                Hapus Laporan
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal Contact Reporter -->
+<div id="contact-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl border border-slate-200">
+        <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+                <h2 class="text-lg font-extrabold text-slate-900">Hubungi Pelapor</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Gunakan informasi di bawah untuk koordinasi verifikasi dan serah terima barang.</p>
+            </div>
+            <button type="button" class="close-contact-modal text-slate-400 hover:text-slate-700 text-xl font-bold leading-none">&times;</button>
+        </div>
+
+        <div class="space-y-3 my-5">
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                <span class="block text-xs font-semibold text-slate-500">Nama Pelapor</span>
+                <span class="block text-sm font-bold text-slate-900 mt-0.5">
+                    {{ item.reporter.full_name|default:item.reporter.username }}
+                    <span class="font-normal text-slate-500">(@{{ item.reporter.username }})</span>
+                </span>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <span class="block text-xs font-semibold text-slate-500">Kontak (WhatsApp / LINE / HP)</span>
+                    {% if item.reporter.contact %}
+                        <span class="block text-sm font-bold text-slate-900 mt-0.5 truncate">{{ item.reporter.contact }}</span>
+                    {% else %}
+                        <span class="block text-sm text-slate-400 italic mt-0.5">Belum dicantumkan oleh pelapor</span>
+                    {% endif %}
+                </div>
+                {% if item.reporter.contact %}
+                    <button type="button" data-copy="{{ item.reporter.contact }}" class="copy-contact-btn shrink-0 px-3 py-1.5 rounded-lg bg-fasilkom-50 hover:bg-fasilkom-100 text-fasilkom-700 text-xs font-bold transition">
+                        Salin
+                    </button>
+                {% endif %}
+            </div>
+
+            {% if item.reporter.email %}
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <span class="block text-xs font-semibold text-slate-500">Email</span>
+                        <span class="block text-sm font-bold text-slate-900 mt-0.5 truncate">{{ item.reporter.email }}</span>
+                    </div>
+                    <button type="button" data-copy="{{ item.reporter.email }}" class="copy-contact-btn shrink-0 px-3 py-1.5 rounded-lg bg-fasilkom-50 hover:bg-fasilkom-100 text-fasilkom-700 text-xs font-bold transition">
+                        Salin
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+
+        <button type="button" class="close-contact-modal w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition">
+            Tutup
+        </button>
+    </div>
+</div>
+{% endblock %}
 
     <h1>{{ item.name }}</h1>
     <p><strong>Tipe Laporan:</strong> {{ item.get_report_type_display }}</p>

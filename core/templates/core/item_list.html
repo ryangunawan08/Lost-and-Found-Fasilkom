@@ -1,58 +1,183 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Daftar Barang - Lost & Found Fasilkom</title>
-</head>
-<body>
-    <h1>Daftar Barang Hilang & Ditemukan</h1>
-    <p>
-        <a href="{% url 'item_create_lost' %}">+ Lapor Barang Saya yang Hilang</a> |
-        <a href="{% url 'item_create_found' %}">+ Lapor Barang yang Ditemukan</a>
-    </p>
+{% extends "core/base.html" %}
 
-    <form method="get">
-        <input type="text" name="q" placeholder="Cari nama barang / ruangan..." value="{{ selected_q }}">
-        <select name="report_type">
-            <option value="">Semua Tipe</option>
-            {% for val, label in report_types %}
-                <option value="{{ val }}" {% if selected_report_type == val %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
-        <select name="category">
-            <option value="">Semua Kategori</option>
-            {% for val, label in categories %}
-                <option value="{{ val }}" {% if selected_category == val %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
-        <select name="location">
-            <option value="">Semua Lokasi</option>
-            {% for val, label in locations %}
-                <option value="{{ val }}" {% if selected_location == val %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
-        <select name="status">
-            <option value="">Semua Status</option>
-            {% for val, label in statuses %}
-                <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Filter</button>
-        <a href="{% url 'item_list' %}">Reset</a>
+{% block title %}Daftar Barang - Lost & Found Fasilkom UI{% endblock %}
+
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Daftar Barang Hilang &amp; Ditemukan</h1>
+            <p class="text-sm text-slate-600 mt-1">Cari dan saring laporan barang di lingkungan Fasilkom UI.</p>
+        </div>
+        <div class="flex flex-wrap gap-2.5">
+            <a href="{% url 'item_create_lost' %}" class="px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-sm font-semibold transition">
+                + Lapor Hilang
+            </a>
+            <a href="{% url 'item_create_found' %}" class="px-4 py-2.5 rounded-xl bg-fasilkom-800 hover:bg-fasilkom-700 text-white text-sm font-semibold shadow-sm transition">
+                + Lapor Ditemukan
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter & Search Box -->
+    <form method="get" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <!-- Pencarian -->
+            <div class="sm:col-span-2">
+                <label for="filter-q" class="block text-xs font-semibold text-slate-600 mb-1">Kata Kunci</label>
+                <input
+                    id="filter-q"
+                    type="text"
+                    name="q"
+                    value="{{ selected_q }}"
+                    placeholder="Nama barang atau ruangan..."
+                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-fasilkom-600 focus:ring-2 focus:ring-fasilkom-100"
+                >
+            </div>
+
+            <!-- Tipe Laporan -->
+            <div>
+                <label for="filter-type" class="block text-xs font-semibold text-slate-600 mb-1">Tipe</label>
+                <select id="filter-type" name="report_type" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:border-fasilkom-600">
+                    <option value="">Semua Tipe</option>
+                    {% for val, label in report_types %}
+                        <option value="{{ val }}" {% if selected_report_type == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Kategori -->
+            <div>
+                <label for="filter-category" class="block text-xs font-semibold text-slate-600 mb-1">Kategori</label>
+                <select id="filter-category" name="category" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:border-fasilkom-600">
+                    <option value="">Semua Kategori</option>
+                    {% for val, label in categories %}
+                        <option value="{{ val }}" {% if selected_category == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Lokasi -->
+            <div>
+                <label for="filter-location" class="block text-xs font-semibold text-slate-600 mb-1">Gedung</label>
+                <select id="filter-location" name="location" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:border-fasilkom-600">
+                    <option value="">Semua Gedung</option>
+                    {% for val, label in locations %}
+                        <option value="{{ val }}" {% if selected_location == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Status -->
+            <div>
+                <label for="filter-status" class="block text-xs font-semibold text-slate-600 mb-1">Status</label>
+                <select id="filter-status" name="status" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:border-fasilkom-600">
+                    <option value="">Semua Status</option>
+                    {% for val, label in statuses %}
+                        <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-xs text-slate-500">
+                Menampilkan <strong class="text-slate-800">{{ items|length }}</strong> laporan barang
+            </p>
+            <div class="flex items-center gap-2">
+                <a href="{% url 'item_list' %}" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+                    Reset
+                </a>
+                <button type="submit" class="px-5 py-2 rounded-xl bg-fasilkom-700 hover:bg-fasilkom-800 text-white text-sm font-semibold shadow-sm transition">
+                    Terapkan Filter
+                </button>
+            </div>
+        </div>
     </form>
 
-    <hr>
+    <!-- Daftar Kartu Barang -->
+    {% if items %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for item in items %}
+                <a href="{% url 'item_detail' item.pk %}" class="group bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md hover:border-fasilkom-200 transition flex flex-col">
+                    <!-- Thumbnail -->
+                    <div class="relative h-48 bg-slate-100 overflow-hidden flex items-center justify-center">
+                        {% if item.category == 'DOKUMEN' %}
+                            <div class="text-center px-6">
+                                <div class="w-12 h-12 mx-auto rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mb-2">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-xs font-semibold text-slate-700">Privasi Dokumen Dilindungi</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Foto tidak ditampilkan untuk identitas</p>
+                            </div>
+                        {% elif item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        {% else %}
+                            <div class="text-center text-slate-400">
+                                <svg class="w-10 h-10 mx-auto mb-1.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span class="text-xs font-medium">Tanpa Foto</span>
+                            </div>
+                        {% endif %}
 
-    <ul>
-        {% for item in items %}
-            <li>
-                <strong>[{{ item.get_report_type_display }}]</strong>
-                <a href="{% url 'item_detail' item.pk %}">{{ item.name }}</a>
-                — {{ item.get_category_display }} | {{ item.get_location_display }} ({{ item.location_detail }})
-                | Status: <strong>{{ item.get_status_display }}</strong>
-            </li>
-        {% empty %}
-            <li>Belum ada laporan barang.</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+                        <!-- Badges -->
+                        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                            {% if item.report_type == 'LOST' %}
+                                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-600 text-white shadow-sm">Lost</span>
+                            {% else %}
+                                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white shadow-sm">Found</span>
+                            {% endif %}
+
+                            {% if item.status == 'ACTIVE' %}
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-white/95 text-fasilkom-800 shadow-sm">Active</span>
+                            {% else %}
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-700/90 text-white shadow-sm">Returned</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="p-5 flex-1 flex flex-col">
+                        <span class="text-xs font-semibold text-fasilkom-600 mb-1 line-clamp-1">{{ item.get_category_display }}</span>
+                        <h2 class="text-lg font-bold text-slate-900 group-hover:text-fasilkom-700 transition line-clamp-1">
+                            {{ item.name }}
+                        </h2>
+                        <p class="mt-2 text-sm text-slate-600 line-clamp-1">
+                            &#128205; {{ item.get_location_display }} &mdash; {{ item.location_detail }}
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                            <span>{{ item.incident_date|date:"d M Y" }}</span>
+                            <span class="font-semibold text-fasilkom-700 group-hover:translate-x-0.5 transition">Lihat Detail &rarr;</span>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center">
+            <div class="w-14 h-14 mx-auto rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mb-3">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+            <h2 class="text-lg font-bold text-slate-800">Tidak ada laporan barang yang cocok</h2>
+            <p class="text-sm text-slate-500 mt-1 max-w-md mx-auto">
+                Coba ubah kata kunci pencarian atau reset filter untuk melihat semua laporan yang tersedia.
+            </p>
+            <div class="mt-5 flex flex-wrap justify-center gap-3">
+                <a href="{% url 'item_list' %}" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition">
+                    Reset Filter
+                </a>
+                <a href="{% url 'item_create_lost' %}" class="px-4 py-2.5 rounded-xl bg-fasilkom-800 hover:bg-fasilkom-700 text-white text-sm font-semibold transition">
+                    + Buat Laporan Baru
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
